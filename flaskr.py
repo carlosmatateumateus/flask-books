@@ -27,3 +27,5 @@ def before_request():
 @app.teardown_request
 def teardow_request(exception):
   g.db.close()
+
+init_db()
