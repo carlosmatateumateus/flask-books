@@ -1,0 +1,6 @@
+CREATE TABLE books (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title VARCHAR(255),
+  description TEXT NOT NULL,
+  price FLOAT
+);
