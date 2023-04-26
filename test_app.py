@@ -19,41 +19,37 @@ class FlaskrTestCase(unittest.TestCase):
         os.unlink(app.config['DATABASE'])
 
     def test_books(self):
-        '''
-        CRUD BOOK
-        '''
+        # Create book
 
         rv = self.client.post('/create', json={
             "title": "Lobos",
             "description": "Lobos",
             "price": 240.32,
         })
-
         self.assertEqual(rv.status_code, 201)
 
-        books = self.client.get('/')
+        # Get all Book
 
-        self.assertEqual(books.status_code, 200)
+        rv = self.client.get('/')
+        self.assertEqual(rv.status_code, 200)
+
+        # Get Book
 
         rv = self.client.get('/read/1')
         self.assertEqual(rv.status_code, 200)
+
+        # Update Book
 
         rv = self.client.put('/update/1', json={
             "title": "Cães",
             "description": "Cães",
             "price": 40.67,
         })
-
         self.assertEqual(rv.status_code, 202)   
 
-    def test_delete_book(self):
-        '''
-        DELETE BOOK
-        '''
+        # Delete Book
         book = self.client.delete('/delete/122')
-
         self.assertEqual(book.status_code, 200)
-
 
 if __name__ == '__main__':
     unittest.main()

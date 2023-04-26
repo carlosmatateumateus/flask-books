@@ -1,5 +1,5 @@
 from flaskr import app
-from flask import g, request, abort, jsonify
+from flask import g, request, abort
 
 @app.route('/', methods=['GET'])
 def index():       
@@ -10,6 +10,7 @@ def index():
             ) 
     for books in books.fetchall()], 200
 
+
 @app.route('/create', methods=['POST'])
 def create():
     try:
@@ -18,43 +19,38 @@ def create():
         VALUES("{request.json['title']}", "{request.json['price']}", "{request.json['description']}"
         );
         ''')
-
-        g.db.commit()
         
         return 'product has been created.', 201
-    
     except:
         return abort(400)
-    
+
 
 @app.route('/read/<int:id>', methods=['GET'])
 def read(id):
-    book = list(g.db.cursor().execute(f'SELECT * FROM books WHERE id == {id};'))
-
-    if (len(book) == 0):
-        return abort(404)
-
-    return book, 200        
+    try:
+        return [dict(
+                    id=element[0], title=element[1],
+                    description=element[2], price=element[3]
+                ) 
+        for element in g.db.cursor().execute(f'SELECT * FROM books WHERE id == {id};').fetchall()
+        ][0], 200
+    except:
+        return abort(404)       
 
 
 @app.route('/update/<int:id>', methods=['PUT'])
 def update(id):
-    book = list(g.db.cursor().execute(f'SELECT * FROM books WHERE id=={id};'))
-
-    if (not len(book) == 1):
+    if not len(list(g.db.cursor().execute(f'SELECT * FROM books WHERE id=={id};'))) == 1:
         return abort(404)
     else: 
         try:
-            book = g.db.cursor().execute(f'''
+            g.db.cursor().execute(f'''
             UPDATE books SET title="{request.json['title']}",
             description="{request.json['description']}",
             price="{request.json['price']}" WHERE id=={id};
             ''')
 
-            g.db.commit()
-
             return 'product has been updated', 202
-        
         except:
             return abort(400)
     
@@ -62,11 +58,7 @@ def update(id):
 @app.route('/delete/<int:id>', methods=['DELETE'])
 def delete(id):
     try:
-        g.db.cursor().execute(f'''
-        DELETE FROM books WHERE id={id}
-        ''')
-
-        g.db.commit()
+        g.db.cursor().execute(f'DELETE FROM books WHERE id={id}')
 
         return 'product has been deleted', 200
     except:
