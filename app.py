@@ -32,7 +32,7 @@ def read(id):
                     id=element[0], title=element[1],
                     description=element[2], price=element[3]
                 ) 
-        for element in g.db.cursor().execute(f'SELECT * FROM books WHERE id == {id};').fetchall()
+        for element in g.db.cursor().execute(f'SELECT * FROM books WHERE id={id};').fetchall()
         ][0], 200
     except:
         return abort(404)       
@@ -40,14 +40,14 @@ def read(id):
 
 @app.route('/update/<int:id>', methods=['PUT'])
 def update(id):
-    if not len(list(g.db.cursor().execute(f'SELECT * FROM books WHERE id=={id};'))) == 1:
+    if not len(list(g.db.cursor().execute(f'SELECT * FROM books WHERE id={id};'))) == 1:
         return abort(404)
     else: 
         try:
             g.db.cursor().execute(f'''
             UPDATE books SET title="{request.json['title']}",
             description="{request.json['description']}",
-            price="{request.json['price']}" WHERE id=={id};
+            price="{request.json['price']}" WHERE id={id};
             ''')
 
             return 'product has been updated', 202
